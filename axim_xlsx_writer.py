@@ -13,9 +13,18 @@ Tabs:
   Run_Log          per-source status, row count, timing, errors
 """
 
+import re as _re
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+
+# Strip characters that openpyxl/Excel rejects (control chars, etc.)
+_ILLEGAL = _re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f]')
+
+def _safe(v):
+    if isinstance(v, str):
+        return _ILLEGAL.sub('', v)
+    return v
 
 NAVY = "1F3864"
 LIGHT = "D9E1F2"
@@ -68,7 +77,7 @@ def _table(ws, start_row, headers, rows, money_cols=()):
     for rec in rows:
         for j, h in enumerate(headers, start=1):
             v = rec.get(h)
-            c = ws.cell(row=r, column=j, value=("" if v is None else v))
+            c = ws.cell(row=r, column=j, value=("" if v is None else _safe(v)))
             c.alignment = WRAP
             c.border = BORDER
             if h in money_cols and isinstance(v, (int, float)):
