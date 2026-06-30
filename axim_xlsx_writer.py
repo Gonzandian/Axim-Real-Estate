@@ -135,21 +135,40 @@ def write_workbook(res, path):
     r += 1
 
     r = _section(ws, r, "DOB — Certificate of Occupancy & Violations")
-    for k, v in res["cofo_sum"].items():
-        r = _kv(ws, r, k, v)
+    if res["cofo_sum"]:
+        for k, v in res["cofo_sum"].items():
+            r = _kv(ws, r, k, v)
+    else:
+        r = _kv(ws, r, "Certificate of Occupancy",
+                "No C of O on file with DOB (common for pre-1938 buildings)")
     r = _kv(ws, r, "Open DOB violations", len(res["dobv"]))
     r = _kv(ws, r, "Open ECB/environmental violations", len(res["ecbv"]))
     r = _kv(ws, r, "Open HPD violations", len(res["hpdv"]))
     r += 1
 
     r = _section(ws, r, "ACRIS — Mortgage, Deed, Owner")
-    for k, v in res["acris_sum"].items():
-        r = _kv(ws, r, k, v)
+    if res["acris_sum"]:
+        for k, v in res["acris_sum"].items():
+            r = _kv(ws, r, k, v)
+    else:
+        r = _kv(ws, r, "Recorded transactions",
+                "No private market transactions on file (likely city / government / long-held)")
     r += 1
 
     r = _section(ws, r, "DOF — Tax Bill & Account Balance")
-    for k, v in res["tax_info"].items():
-        r = _kv(ws, r, k, v)
+    if res["tax_info"]:
+        for k, v in res["tax_info"].items():
+            r = _kv(ws, r, k, v)
+        # Statement located but no amount due / market value parsed → likely tax-exempt
+        amt = res["tax_info"].get("Amount due")
+        mv  = res["tax_info"].get("Est. market value (from bill)")
+        if (res["tax_info"].get("Statement found") in ("Yes", True)
+                and not amt and not mv):
+            r = _kv(ws, r, "Note",
+                    "Statement located but no amount due / market value parsed — "
+                    "typical for tax-exempt owners (DOE, NYCHA, non-profit, government)")
+    else:
+        r = _kv(ws, r, "Tax bill", "No DOF Statement of Account found on probed dates")
 
     _autosize(ws, {"A": 34, "B": 70})
 
@@ -191,14 +210,22 @@ def write_workbook(res, path):
     r = 1
     ws.cell(row=r, column=1, value="ACRIS — Current Mortgage / Deed / Owner").font = BOLD
     r += 2
-    for k, v in res["acris_sum"].items():
-        _kv(ws, r, k, v)
+    if res["acris_sum"]:
+        for k, v in res["acris_sum"].items():
+            _kv(ws, r, k, v)
+            r += 1
+    else:
+        _kv(ws, r, "Status",
+            "No private market transactions on file (likely city / government / long-held)")
         r += 1
     r += 1
     ws.cell(row=r, column=1, value="All recorded documents (most recent first)").font = BOLD
     r += 1
-    _table(ws, r, ["Doc type", "Doc date", "Recorded", "Amount", "Doc ID"],
-           res["acris_txns"], money_cols={"Amount"})
+    if res["acris_txns"]:
+        _table(ws, r, ["Doc type", "Doc date", "Recorded", "Amount", "Doc ID"],
+               res["acris_txns"], money_cols={"Amount"})
+    else:
+        _kv(ws, r, "Status", "No recorded documents found")
     _autosize(ws, {"A": 34, "B": 16, "C": 14, "D": 16, "E": 30})
 
     # ---------- Raw PLUTO ----------

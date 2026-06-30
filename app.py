@@ -424,11 +424,33 @@ if run and query.strip():
         v4.metric("HPD", len(res["hpdv"]))
 
         # Owner / mortgage
+        st.markdown("**Ownership & financing**")
         if res["acris_sum"]:
-            st.markdown("**Ownership & financing**")
             for k, v in res["acris_sum"].items():
                 if v:
                     st.markdown(f"- **{k}:** {v}")
+        else:
+            st.markdown(
+                "- *No private market transactions on file* "
+                "(likely city / government / long-held)"
+            )
+
+        # C of O note (if missing)
+        if not res["cofo_sum"]:
+            st.caption(
+                "Note: no Certificate of Occupancy on file with DOB — "
+                "common for pre-1938 buildings."
+            )
+
+        # Tax-exempt note (if SOA found but no amount due / market value)
+        ti = res.get("tax_info") or {}
+        if (ti.get("Statement found") in ("Yes", True)
+                and not ti.get("Amount due")
+                and not ti.get("Est. market value (from bill)")):
+            st.caption(
+                "Note: DOF Statement of Account located but no amount due / market value "
+                "parsed — typical for tax-exempt owners (DOE, NYCHA, non-profit, government)."
+            )
 
         st.divider()
 
