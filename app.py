@@ -25,12 +25,23 @@ st.markdown(
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ── Global ── */
-        html, body, [class*="st-"], .stMarkdown, p, span, div, label, input, button {
+        /* ── Global (scoped — don't touch icon fonts or button internals) ── */
+        html, body, .stApp {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #0B1F3A;
+            background: #FBFAF7;
+        }
+        .stApp p, .stApp label, .stApp .stMarkdown,
+        .stApp [data-testid="stMarkdownContainer"] {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: #0B1F3A;
         }
-        .stApp { background: #FBFAF7; }
+        /* Material icons / symbols must keep their own font — never override */
+        .material-icons, .material-symbols-rounded,
+        [class*="material-symbols"], [class*="material-icons"],
+        [data-testid="stIconMaterial"] {
+            font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+        }
         .block-container { max-width: 780px; padding-top: 1rem; padding-bottom: 4rem; }
         #MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; }
 
@@ -112,51 +123,70 @@ st.markdown(
             outline: none;
         }
 
-        /* ── Button ── */
+        /* ── Primary button (Compile) ── */
         .stButton > button {
-            background-color: #0B1F3A;
-            color: #FBFAF7;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            font-size: 0.85rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
+            background-color: #0B1F3A !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 500 !important;
+            font-size: 0.85rem !important;
+            letter-spacing: 0.14em !important;
+            text-transform: uppercase !important;
             width: 100%;
-            padding: 0.85rem 1rem;
-            border-radius: 2px;
-            border: 1px solid #0B1F3A;
-            transition: background 0.15s ease;
+            padding: 0.85rem 1rem !important;
+            border-radius: 2px !important;
+            border: 1px solid #0B1F3A !important;
+            transition: background 0.15s ease, color 0.15s ease;
         }
-        .stButton > button:hover:not([disabled]) {
-            background-color: #B89968;
-            border-color: #B89968;
-            color: #0B1F3A;
-        }
-        .stButton > button[disabled] {
-            background-color: #E5E7EB;
-            border-color: #E5E7EB;
-            color: #9CA3AF;
-        }
+        .stButton > button p,
+        .stButton > button span,
+        .stButton > button div,
+        .stButton > button { color: #FBFAF7 !important; }
 
-        /* ── Download button (secondary style) ── */
+        .stButton > button:hover:not([disabled]) {
+            background-color: #B89968 !important;
+            border-color: #B89968 !important;
+        }
+        .stButton > button:hover:not([disabled]) p,
+        .stButton > button:hover:not([disabled]) span,
+        .stButton > button:hover:not([disabled]) div,
+        .stButton > button:hover:not([disabled]) { color: #0B1F3A !important; }
+
+        .stButton > button[disabled] {
+            background-color: #E5E7EB !important;
+            border-color: #E5E7EB !important;
+        }
+        .stButton > button[disabled] p,
+        .stButton > button[disabled] span,
+        .stButton > button[disabled] div,
+        .stButton > button[disabled] { color: #9CA3AF !important; }
+
+        /* ── Download button (gold) ── */
         .stDownloadButton > button {
-            background-color: #B89968;
-            color: #0B1F3A;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.85rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
+            background-color: #B89968 !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            letter-spacing: 0.14em !important;
+            text-transform: uppercase !important;
             width: 100%;
-            padding: 0.85rem 1rem;
-            border-radius: 2px;
-            border: 1px solid #B89968;
+            padding: 0.85rem 1rem !important;
+            border-radius: 2px !important;
+            border: 1px solid #B89968 !important;
+            transition: background 0.15s ease, color 0.15s ease;
         }
+        .stDownloadButton > button p,
+        .stDownloadButton > button span,
+        .stDownloadButton > button div,
+        .stDownloadButton > button { color: #0B1F3A !important; }
+
         .stDownloadButton > button:hover {
-            background-color: #0B1F3A;
-            color: #FBFAF7;
-            border-color: #0B1F3A;
+            background-color: #0B1F3A !important;
+            border-color: #0B1F3A !important;
         }
+        .stDownloadButton > button:hover p,
+        .stDownloadButton > button:hover span,
+        .stDownloadButton > button:hover div,
+        .stDownloadButton > button:hover { color: #FBFAF7 !important; }
 
         /* ── Metrics ── */
         [data-testid="stMetric"] {
